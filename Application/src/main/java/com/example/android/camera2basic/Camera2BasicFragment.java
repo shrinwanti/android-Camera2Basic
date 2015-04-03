@@ -328,21 +328,19 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
     private static Size chooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio) {
         // Collect the supported resolutions that are at least as big as the preview Surface
         List<Size> bigEnough = new ArrayList<Size>();
-        int w = aspectRatio.getWidth();
-        int h = aspectRatio.getHeight();
+        int w = 4;
+        int h = 3;
         for (Size option : choices) {
-            if (option.getHeight() == option.getWidth() * h / w &&
-                    option.getWidth() >= width && option.getHeight() >= height) {
+            if (option.getHeight() == option.getWidth() * h / w) {
                 bigEnough.add(option);
             }
         }
 
         // Pick the smallest of those, assuming we found any
         if (bigEnough.size() > 0) {
-            return Collections.min(bigEnough, new CompareSizesByArea());
+            return bigEnough.get(0);
         } else {
-            Log.e(TAG, "Couldn't find any suitable preview size");
-            return choices[0];
+            throw new RuntimeException("no optimal size found");
         }
     }
 
@@ -410,7 +408,7 @@ public class Camera2BasicFragment extends Fragment implements View.OnClickListen
 
                 // We don't use a front facing camera in this sample.
                 if (characteristics.get(CameraCharacteristics.LENS_FACING)
-                        == CameraCharacteristics.LENS_FACING_FRONT) {
+                        != CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
 
